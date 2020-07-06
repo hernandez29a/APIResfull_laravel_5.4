@@ -4,7 +4,7 @@ namespace App;
 
 use App\Transactions;
 
-class Buyer extends Model
+class Buyer extends User
 {
     public function transactions()
     {
