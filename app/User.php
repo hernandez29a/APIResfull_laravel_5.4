@@ -31,6 +31,24 @@ class User extends Authenticatable
         'admin',
     ];
 
+    //Se envia a la bd el nombre del usuario en minusculas
+    public function setNameAttribute($valor)
+    {
+        $this->attributes['name'] = strtolower($valor);
+    }
+
+    //se muestra al usuario q la inicial del nombre este en mayuscula
+    public function getNameAttribute($valor)
+    {
+        return ucwords($valor);
+    }
+
+    //Se envia a la bd el correo del usuario en minusculas
+    public function setEmailAttribute($valor)
+    {
+        $this->attributes['email'] = strtolower($valor);
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *
