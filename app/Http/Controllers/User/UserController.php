@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\User;
+use App\Buyer;
+use App\Seller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 
@@ -66,12 +68,12 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $usuario = User::findOrFail($id);
+        //$usuario = User::findOrFail($id);
 
         //return response()->json(['data', $usuario], 200);
-        return $this->showOne($usuario);
+        return $this->showOne($user);
     }
 
 
@@ -82,9 +84,9 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
+        //$user = User::findOrFail($id);
 
         $reglas = [
             'email' => 'email|unique:users,email,' . $user->id,
@@ -136,13 +138,13 @@ class UserController extends ApiController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
-
+        if (Buyer::find($user->id) || Seller::find($user->id)){
+            return $this->errorResponse('No puede eliminarse un recurso que está relacionado a otro', 409);
+        }
+ 
         $user->delete();
-
-        //return response()->json(['data' => $user], 200);
         return $this->showOne($user);
     }
 }
