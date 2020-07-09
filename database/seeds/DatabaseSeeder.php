@@ -23,6 +23,11 @@ class DatabaseSeeder extends Seeder
         Transaction::truncate();
         DB::table('category_product')->truncate();
 
+        User::flushEventListeners();
+        Category::flushEventListeners();
+        Product::flushEventListeners();
+        Transaction::flushEventListeners();
+
         //metodo usado para que no mande 1000 correos por cada cuenta que crea laravel
         //a parte desactiva los eventos de los otros campos
         User::flushEventListeners();
