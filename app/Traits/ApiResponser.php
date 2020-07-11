@@ -3,7 +3,10 @@
 namespace App\Traits;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 //Archivo usado para mostrar las respuyestas de tipo json al ApiController
 trait ApiResponser
@@ -41,7 +44,9 @@ trait ApiResponser
         
         $collection = $this->filterData($collection, $transformer);
         $collection = $this->sortData($collection, $transformer);
-		$collection = $this->transformData($collection, $transformer);
+        $collection = $this->paginate($collection);
+        $collection = $this->transformData($collection, $transformer);
+        $collection = $this->cacheResponse($collection);
 
 		return $this->successResponse($collection, $code);
     }
@@ -111,6 +116,37 @@ trait ApiResponser
     }
 
 
+    /**
+     * Paginar los resultados
+     */
+    protected function paginate(Collection $collection)
+	{
+        $rules = [
+			'per_page' => 'integer|min:2|max:50'
+		];
+
+        Validator::validate(request()->all(), $rules);
+        
+		$page = LengthAwarePaginator::resolveCurrentPage();
+
+        $perPage = 15;
+        
+        if (request()->has('per_page')) {
+			$perPage = (int) request()->per_page;
+		}
+
+		$results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+
+		$paginated = new LengthAwarePaginator($results, $collection->count(), $perPage, $page, [
+			'path' => LengthAwarePaginator::resolveCurrentPath(),
+		]);
+
+		$paginated->appends(request()->all());
+
+		return $paginated;
+	}
+
+
 
     /**
      * Metodo para transformar los campos de la base de datos de entrada 
@@ -120,5 +156,25 @@ trait ApiResponser
 		$transformation = fractal($data, new $transformer);
 
 		return $transformation->toArray();
+    }
+    
+    /**
+     * Guardar en el cache la peticion por 30 segundos 
+     */
+    protected function cacheResponse($data)
+	{
+        $url = request()->url();
+        $queryParams = request()->query();
+
+		ksort($queryParams);
+
+		$queryString = http_build_query($queryParams);
+
+		$fullUrl = "{$url}?{$queryString}";
+
+        //colocar el cache por 15 segundos
+		return Cache::remember($fullUrl, 15/60, function() use($data) {
+			return $data;
+		});
 	}
 }

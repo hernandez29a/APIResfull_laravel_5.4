@@ -5,9 +5,18 @@ namespace App\Http\Controllers\Transaction;
 use App\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use App\Transformers\TransactionTransformer;
 
 class TransactionController extends ApiController
 {
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('transform.input:' . TransactionTransformer::class)->only(['store']);
+    }
+
     /**
      * Display a listing of the resource.
      *
