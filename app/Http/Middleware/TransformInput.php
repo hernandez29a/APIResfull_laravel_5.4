@@ -18,14 +18,16 @@ class TransformInput
     {
 
         $transformedInput = [];
+        $allFields = $request->all();
+        $queryParams = $request->query();
 
-        foreach ($request->request->all() as $input => $value) {
+        $transformableFields = array_diff($allFields, $queryParams);
+
+        foreach ($transformableFields as $input => $value) {
             $transformedInput[$transformer::originalAttribute($input)] = $value;
         }
 
         $request->replace($transformedInput);
-
-        //return $next($request);
 
         $response = $next($request);
 
@@ -36,6 +38,7 @@ class TransformInput
 
             foreach ($data->error as $field => $error) {
                 $transformedField = $transformer::transformedAttribute($field);
+
                 $transformedErrors[$transformedField] = str_replace($field, $transformedField, $error);
             }
 

@@ -9,7 +9,7 @@ use App\Transformers\TransactionTransformer;
 
 class TransactionController extends ApiController
 {
-
+    
     public function __construct()
     {
         parent::__construct();
