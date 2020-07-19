@@ -38,6 +38,11 @@ class CategoryController extends ApiController
      */
     public function store(Request $request)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+
         $reglas = [
             'name' => 'required',
             'description' => 'required'
@@ -72,6 +77,10 @@ class CategoryController extends ApiController
      */
     public function update(Request $request, Category $category)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
         $category->fill($request->intersect([
             'name',
             'description'
@@ -95,6 +104,11 @@ class CategoryController extends ApiController
      */
     public function destroy(Category $category)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+        
         $category->delete();
 
         return $this->showOne($category);

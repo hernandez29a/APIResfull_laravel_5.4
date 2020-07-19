@@ -18,9 +18,14 @@ class UserController extends ApiController
     {
         //parent::__construct();
 
-        $this->middleware('client.credentials')->only(['resend','store']);
+        $this->middleware('client.credentials')->only(['store','resend']);
         $this->middleware('auth:api')->except(['store', 'verify', 'resend']);
         $this->middleware('transform.input:' . UserTransformer::class)->only(['store', 'update']);
+        $this->middleware('scope:manage-account')->only(['show', 'update']);
+
+        $this->middleware('can:view,user')->only('show');
+        $this->middleware('can:update,user')->only('update');
+        $this->middleware('can:delete,user')->only('destroy');
     }
 
     /**
@@ -30,6 +35,11 @@ class UserController extends ApiController
      */
     public function index()
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+
         //se muestran todos los usuarios
         $usuarios = User::all();
 
@@ -99,6 +109,11 @@ class UserController extends ApiController
      */
     public function update(Request $request, User $user)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+
         //$user = User::findOrFail($id);
 
         $reglas = [
@@ -124,6 +139,11 @@ class UserController extends ApiController
         }
 
         if ($request->has('admin')) {
+            /**
+            * Verificar si el usuario es administrador y tiene permisos como tal
+            */
+            $this->allowedAdminAction();
+            
             if (!$user->esVerificado()) {
                 //return response()->json(['error' => 'Unicamente los usuarios verificados pueden cambiar su valor de administrador', 'code' => 409], 409);
                 return $this->errorResponse('Unicamente los usuarios verificados pueden cambiar su valor de administrador', 409);

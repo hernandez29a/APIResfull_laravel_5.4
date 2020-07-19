@@ -20,6 +20,10 @@ class BuyerSellerController extends ApiController
     public function index(Buyer $buyer)
     {
         /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+        /**
          * obtenemos los vendedores de la tabla producto por medio de la 
          * relacion de transacciones y obtenemos esa lista con el metodo get
          */

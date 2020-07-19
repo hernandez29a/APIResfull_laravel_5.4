@@ -20,6 +20,11 @@ class ProductBuyerController extends ApiController
      */
     public function index(Product $product)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+        
         $buyers = $product->transactions()
             ->with('buyer')
             ->get()

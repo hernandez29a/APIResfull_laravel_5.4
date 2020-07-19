@@ -15,6 +15,8 @@ class TransactionController extends ApiController
         parent::__construct();
 
         $this->middleware('transform.input:' . TransactionTransformer::class)->only(['store']);
+        $this->middleware('scope:read-general')->only('show');
+        $this->middleware('can:view,transaction')->only('show');
     }
 
     /**
@@ -24,6 +26,11 @@ class TransactionController extends ApiController
      */
     public function index()
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+        
         $transactions = Transaction::all();
         return $this->showAll($transactions);
     }

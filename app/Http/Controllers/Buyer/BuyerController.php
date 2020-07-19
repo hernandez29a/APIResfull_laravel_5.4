@@ -11,6 +11,8 @@ class BuyerController extends ApiController
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('scope:read-general')->only('show');
+        $this->middleware('can:view,buyer')->only('show');
     }
     
     /**
@@ -20,6 +22,10 @@ class BuyerController extends ApiController
      */
     public function index()
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
         /**
          * obtener a los usuarios que tengan transacciones
          * y mostrarlos en el arreglo de data

@@ -20,6 +20,11 @@ class CategoryTransactionController extends ApiController
      */
     public function index(Category $category)
     {
+        /**
+         * Verificar si el usuario es administrador y tiene permisos como tal
+         */
+        $this->allowedAdminAction();
+        
 
         /**
          * Obtenemos una lista de productos 
