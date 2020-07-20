@@ -102,7 +102,7 @@ class SellerProductController extends ApiController
 
         $this->verificarVendedor($seller, $product);
 
-        $product->fill($request->intersect([
+        $product->fill($request->only([
             'name',
             'description',
             'quantity',

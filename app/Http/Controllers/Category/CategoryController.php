@@ -81,7 +81,7 @@ class CategoryController extends ApiController
          * Verificar si el usuario es administrador y tiene permisos como tal
          */
         $this->allowedAdminAction();
-        $category->fill($request->intersect([
+        $category->fill($request->only([
             'name',
             'description'
         ]));
